@@ -16,7 +16,7 @@ module.exports = (function () {
             producer: String,
             age: Date,
             city: String,
-            Tags: []
+            tags: []
         });
         //Mongoose uses plural of model as collection, so collection name is "beers"
         Beer = mongoose.model("Beer", BeerSchema);
@@ -76,7 +76,7 @@ module.exports = (function () {
 
     function addTagToBeer(id, tag) {
         return new Promise(function (resolve, reject) {
-            Beer.findByIdAndUpdate(id, {$push: {Tags: tag}}, {safe: true, upsert: true}, function (err, beer) {
+            Beer.findByIdAndUpdate(id, {$push: {tags: tag}}, {safe: true, upsert: true}, function (err, beer) {
                 if (err) {
                     reject(err);
                 }
