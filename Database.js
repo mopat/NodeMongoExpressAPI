@@ -13,7 +13,7 @@ module.exports = (function () {
         // Model our Schema
         var BeerSchema = mongoose.Schema({
             name: String,
-            producer: String,
+            manufacturer: String,
             age: Date,
             city: String,
             tags: []
@@ -53,11 +53,28 @@ module.exports = (function () {
     }
 
     function getBeerByName(name) {
-
+        return new Promise(function (resolve, reject) {
+            Beer.find({name: name}, function (err, beer) {
+                console.log(name)
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(beer);
+                }
+            });
+        });
     }
 
     function getBeerByManufacturer(manufacturer) {
-
+        return new Promise(function (resolve, reject) {
+            Beer.find({manufacturer: manufacturer}, function (err, beer) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(beer);
+                }
+            });
+        });
     }
 
     function insertBeer(beerObj) {
@@ -76,14 +93,21 @@ module.exports = (function () {
 
     function addTagToBeer(id, tag) {
         return new Promise(function (resolve, reject) {
-            Beer.findByIdAndUpdate(id, {$push: {tags: tag}}, {safe: true, upsert: true}, function (err, beer) {
-                if (err) {
-                    reject(err);
+            Beer.count({tags: {$in: [tag]}, _id: id}, function (err, count) {
+                console.log(count);
+                if (count == 0) {
+                    Beer.findByIdAndUpdate(id, {$push: {tags: tag}}, {safe: true, upsert: true}, function (err, beer) {
+                        if (err) {
+                            reject(err);
+                        }
+                        else {
+                            resolve(beer);
+                        }
+                    })
                 }
-                else {
-                    resolve(beer);
-                }
-            })
+                else      resolve('Tag already exists');
+            });
+
         });
     }
 
@@ -110,6 +134,8 @@ module.exports = (function () {
     that.insertBeer = insertBeer;
     that.deleteBeer = deleteBeer;
     that.addTagToBeer = addTagToBeer;
+    that.getBeerByManufacturer = getBeerByManufacturer;
+    that.getBeerByName = getBeerByName;
     that.isConnected = isConnected;
     return that;
 })();

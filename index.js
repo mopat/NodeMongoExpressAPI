@@ -7,22 +7,42 @@ var app = express();
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({extended: true})); // support encoded bodies
 
-app.get("/beer", function (req, res) {
-    // console.log(JSON.stringify(req.headers));
-    var beers = database.getAllBeers().then(function (beers) {
-        //res.send(req);
-        //res.send('manufacturer: ' + req.query.manufacturer);
-        // res.send('name: ' + req.query.name);
-        res.json(beers);
-    }).catch(function (err) {
-        console.log(err);
-        res.sendStatus(500);
-    })
-});
 
 /*
  GET Routes
  */
+app.get("/beer", function (req, res) {
+    if (req.query.manufacturer != undefined) {
+        database.getBeerByManufacturer(req.query.manufacturer).then(function (beer) {
+            res.json(beer);
+        }).catch(function (err) {
+            console.log(err);
+            res.sendStatus(500);
+        });
+    }
+    if (req.query.name != undefined) {
+        database.getBeerByName(req.query.name).then(function (beer) {
+            res.json(beer);
+        }).catch(function (err) {
+            console.log(err);
+            res.sendStatus(500);
+        });
+    }
+    else {
+        database.getAllBeers().then(function (beers) {
+
+            //res.send(req);
+            //res.send('manufacturer: ' + req.query.manufacturer);
+            // res.send('name: ' + req.query.name);
+            res.json(beers);
+        }).catch(function (err) {
+            console.log(err);
+            res.sendStatus(500);
+        })
+    }
+});
+
+
 app.get("/", function (req, res) {
     res.end("Hello World");
 });
