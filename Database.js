@@ -15,9 +15,10 @@ module.exports = (function () {
             name: String,
             producer: String,
             age: Date,
+            city: String,
             Tags: []
         });
-//Mongoose uses plural of model as collection, so collection name is "beers"
+        //Mongoose uses plural of model as collection, so collection name is "beers"
         Beer = mongoose.model("Beer", BeerSchema);
     }
 
@@ -51,6 +52,54 @@ module.exports = (function () {
         });
     }
 
+    function getBeerByName(name) {
+
+    }
+
+    function getBeerByManufacturer(manufacturer) {
+
+    }
+
+    function insertBeer(beerObj) {
+        var beer = new Beer(beerObj);
+        return new Promise(function (resolve, reject) {
+            beer.save(function (err, beer) {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(beer);
+                }
+            });
+        });
+    }
+
+    function addTagToBeer(id, tag) {
+        return new Promise(function (resolve, reject) {
+            Beer.findByIdAndUpdate(id, {$push: {Tags: tag}}, {safe: true, upsert: true}, function (err, beer) {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(beer);
+                }
+            })
+        });
+    }
+
+    function deleteBeer(id) {
+        return new Promise(function (resolve, reject) {
+            Beer.findByIdAndRemove(id, function (err, beer) {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(beer);
+                }
+            })
+        });
+    }
+
     function isConnected() {
         return connected;
     }
@@ -58,6 +107,9 @@ module.exports = (function () {
     that.init = init;
     that.connect = connect;
     that.getAllBeers = getAllBeers;
+    that.insertBeer = insertBeer;
+    that.deleteBeer = deleteBeer;
+    that.addTagToBeer = addTagToBeer;
     that.isConnected = isConnected;
     return that;
 })();
