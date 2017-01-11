@@ -79,13 +79,18 @@ module.exports = (function () {
     function insertBeer(beerObj) {
         var beer = new Beer(beerObj);
         return new Promise(function (resolve, reject) {
-            beer.save(function (err, beer) {
-                if (err) {
-                    reject(err);
+            Beer.count({name: beerObj.name}, function (err, count) {
+                if (count == 0) {
+                    beer.save(function (err, beer) {
+                        if (err) {
+                            reject(err);
+                        }
+                        else {
+                            resolve(beer);
+                        }
+                    });
                 }
-                else {
-                    resolve(beer);
-                }
+                else resolve([]);
             });
         });
     }
@@ -93,9 +98,13 @@ module.exports = (function () {
     function addTagToBeer(id, tag) {
         return new Promise(function (resolve, reject) {
             Beer.count({tags: {$in: [tag]}, _id: id}, function (err, count) {
-                console.log(count);
                 if (count == 0) {
-                    Beer.findByIdAndUpdate(id, {$push: {tags: tag}}, {safe: true, upsert: true}, function (err, beer) {
+                    // {new: true} enables returning the updated document
+                    Beer.findByIdAndUpdate(id, {$push: {tags: tag}}, {
+                        safe: true,
+                        upsert: true,
+                        new: true
+                    }, function (err, beer) {
                         if (err) {
                             reject(err);
                         }
@@ -104,9 +113,8 @@ module.exports = (function () {
                         }
                     })
                 }
-                else      resolve('Tag already exists');
+                else resolve([]);
             });
-
         });
     }
 
