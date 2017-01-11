@@ -30,11 +30,6 @@ app.get("/beer", function (req, res) {
     }
     else {
         database.getAllBeers().then(function (beers) {
-
-            //res.send(req);
-            //res.send('manufacturer: ' + req.query.manufacturer);
-            // res.send('name: ' + req.query.name);
-            res.json(beers);
         }).catch(function (err) {
             console.log(err);
             res.sendStatus(500);
@@ -52,24 +47,16 @@ app.get("/beer/:id", function (req, res) {
     res.send('beer id: ' + req.params.id);
 });
 
-
-var testObj = {
-    name: "Mooser Liesl",
-    producer: "Arobräu",
-    age: 2000,
-    city: "Mooos",
-    Tags: ["Moos", "Liesl", "Helles"]
-};
 /*
  POST and DELETE ROUTES
  */
 app.post("/beer", function (req, res) {
-    console.log(req.headers);
-    res.set({
-        "Content-Type": "application/json",
-        "Accept": "JSON"
-    });
-    console.log(res.headers);
+    var contentType = "application/json";
+    if(req.get('content-type') != contentType){
+        res.end('Wrong header, only accept '+ contentType);
+        return;
+    }
+
     database.insertBeer(req.body).then(function (beer) {
         res.json(beer);
     }).catch(function (err) {

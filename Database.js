@@ -14,9 +14,9 @@ module.exports = (function () {
         var BeerSchema = mongoose.Schema({
             name: String,
             manufacturer: String,
-            age: Date,
+            age: Number,
             city: String,
-            tags: []
+            tags: [String]
         });
         //Mongoose uses plural of model as collection, so collection name is "beers"
         Beer = mongoose.model("Beer", BeerSchema);
@@ -55,7 +55,6 @@ module.exports = (function () {
     function getBeerByName(name) {
         return new Promise(function (resolve, reject) {
             Beer.find({name: name}, function (err, beer) {
-                console.log(name)
                 if (err) {
                     reject(err);
                 } else {
