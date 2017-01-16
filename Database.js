@@ -14,7 +14,7 @@ module.exports = (function () {
         var BeerSchema = mongoose.Schema({
             name: String,
             manufacturer: String,
-            age: Number,
+            age: Date,
             city: String,
             tags: [String]
         });
@@ -76,6 +76,16 @@ module.exports = (function () {
         });
     }
 
+    //example-data
+    /*
+     {
+     "name": "Mooser Liesl",
+     "manufacturer": "Arcobräu",
+     "age":  -3785462746000 , //="1850-01-16T18:34:14.000Z"
+     "city": "Mooos",
+     "tags": ["Moos", "Liesl", "Helles"]
+     }
+     */
     function insertBeer(beerObj) {
         var beer = new Beer(beerObj);
         return new Promise(function (resolve, reject) {
@@ -95,12 +105,13 @@ module.exports = (function () {
         });
     }
 
+    // also bei mir hat das auch alles ohne mongoose.Types.ObjectId(id) und nur mit id funktioniert. hab das aber trotzdem noch geändert
     function addTagToBeer(id, tag) {
         return new Promise(function (resolve, reject) {
-            Beer.count({tags: {$in: [tag]}, _id: id}, function (err, count) {
+            Beer.count({tags: {$in: [tag]}, _id: mongoose.Types.ObjectId(id)}, function (err, count) {
                 if (count == 0) {
                     // {new: true} enables returning the updated document
-                    Beer.findByIdAndUpdate(id, {$push: {tags: tag}}, {
+                    Beer.findByIdAndUpdate(mongoose.Types.ObjectId(id), {$push: {tags: tag}}, {
                         safe: true,
                         upsert: true,
                         new: true
@@ -120,7 +131,7 @@ module.exports = (function () {
 
     function deleteBeer(id) {
         return new Promise(function (resolve, reject) {
-            Beer.findByIdAndRemove(id, function (err, beer) {
+            Beer.findByIdAndRemove(mongoose.Types.ObjectId(id), function (err, beer) {
                 if (err) {
                     reject(err);
                 }

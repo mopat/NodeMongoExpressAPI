@@ -42,7 +42,7 @@ app.get("/beer", function (req, res, next) {
 app.get("/beer", function (req, res, next) {
     if (req.query.name != undefined) {
         database.getBeerByName(req.query.name).then(function (beer) {
-            if (beer.length != 0) {
+            if (beer.length == 0) {
                 res.end('No beer in database for name "' + req.query.name + '"');
             }
             else
